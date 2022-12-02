@@ -1,4 +1,5 @@
 import { getDayOneResults } from "./day1/day1.ts";
+import { getDayTwoResults } from "./day2/day2.ts";
 
 export interface Result {
     exerciseOne: number,
@@ -14,8 +15,9 @@ async function getDayResults() {
     const day = prompt("Please put in the day of the month you want the answer to:");
     switch(day) { 
         case "1": 
-            printResults(await getDayOneResults())
-            break;
+            return printResults(await getDayOneResults())
+        case "2":
+            return printResults(await getDayTwoResults())
         default:
             return console.log("We don't know the question, but 42 is the answer")
     }
