@@ -10,138 +10,71 @@ enum RockPaperScissorResult {
   Lose = 0,
 }
 
-type OpponentInput = 'A' | 'B' | 'C';
-type MyInput = 'X' | 'Y' | 'Z';
+const mapInputToRockPaperScissor = new Map<string, RockPaperScissor>([
+  ['A', RockPaperScissor.Rock],
+  ['B', RockPaperScissor.Paper],
+  ['C', RockPaperScissor.Scissor],
+  ['X', RockPaperScissor.Rock],
+  ['Y', RockPaperScissor.Paper],
+  ['Z', RockPaperScissor.Scissor],
+]);
 
-const playRockPaperScissorRound = (
-  opponentChoice: RockPaperScissor,
-  myChoice: RockPaperScissor
-): RockPaperScissorResult => {
-  const { Rock, Paper, Scissor } = RockPaperScissor;
-  const { Draw, Win, Lose } = RockPaperScissorResult;
+const mapInputToResult = new Map<string, RockPaperScissorResult>([
+  ['X', RockPaperScissorResult.Lose],
+  ['Y', RockPaperScissorResult.Draw],
+  ['Z', RockPaperScissorResult.Win],
+]);
 
-  if (opponentChoice === myChoice) {
-    return Draw;
-  } else if (
-    (opponentChoice === Rock && myChoice === Paper) ||
-    (opponentChoice === Paper && myChoice === Scissor) ||
-    (opponentChoice === Scissor && myChoice === Rock)
-  ) {
-    return Win;
-  } else {
-    return Lose;
-  }
-};
-
-const playRockPaperScissorRoundByWinOrLoseStrategy = (
-  opponentChoice: RockPaperScissor,
-  desiredResult: RockPaperScissorResult
-): RockPaperScissor => {
-  const { Rock, Paper, Scissor } = RockPaperScissor;
-  const { Draw, Win, Lose } = RockPaperScissorResult;
-
-  switch (desiredResult) {
-    case Draw:
-      return opponentChoice;
-    // deno-lint-ignore no-fallthrough
-    case Win:
-      switch (opponentChoice) {
-        case Rock:
-          return Paper;
-        case Paper:
-          return Scissor;
-        case Scissor:
-          return Rock;
-      }
-    case Lose:
-      switch (opponentChoice) {
-        case Rock:
-          return Scissor;
-        case Paper:
-          return Rock;
-        case Scissor:
-          return Paper;
-      }
-  }
-};
-
-const mapOpponentStrategyToRockPaperScissor = (
-  input: string
-): RockPaperScissor => {
-  const opponentInput = input as OpponentInput;
-  switch (opponentInput) {
-    case 'A':
-      return RockPaperScissor.Rock;
-    case 'B':
-      return RockPaperScissor.Paper;
-    case 'C':
-      return RockPaperScissor.Scissor;
-  }
-};
-
-const mapMyStrategyToRockPaperScissorGuessed = (
-  input: string
-): RockPaperScissor => {
-  const myInput = input as MyInput;
-  switch (myInput) {
-    case 'X':
-      return RockPaperScissor.Rock;
-    case 'Y':
-      return RockPaperScissor.Paper;
-    case 'Z':
-      return RockPaperScissor.Scissor;
-  }
-};
-
-const mapMyStrategyToRockPaperScissorResult = (
-  input: string
-): RockPaperScissorResult => {
-  const myInput = input as MyInput;
-  switch (myInput) {
-    case 'X':
-      return RockPaperScissorResult.Lose;
-    case 'Y':
-      return RockPaperScissorResult.Draw;
-    case 'Z':
-      return RockPaperScissorResult.Win;
-  }
-};
-
-const inputToRockPaperScissorRounds = (input: string): string[][] => {
-  return input.split(/\n/).map((round) => round.split(' '));
+const rockPaperScissorResults: Record<
+  RockPaperScissor,
+  Record<RockPaperScissor, RockPaperScissorResult>
+> = {
+  [RockPaperScissor.Paper]: {
+    [RockPaperScissor.Paper]: RockPaperScissorResult.Draw,
+    [RockPaperScissor.Scissor]: RockPaperScissorResult.Win,
+    [RockPaperScissor.Rock]: RockPaperScissorResult.Lose,
+  },
+  [RockPaperScissor.Rock]: {
+    [RockPaperScissor.Rock]: RockPaperScissorResult.Draw,
+    [RockPaperScissor.Paper]: RockPaperScissorResult.Win,
+    [RockPaperScissor.Scissor]: RockPaperScissorResult.Lose,
+  },
+  [RockPaperScissor.Scissor]: {
+    [RockPaperScissor.Scissor]: RockPaperScissorResult.Draw,
+    [RockPaperScissor.Rock]: RockPaperScissorResult.Win,
+    [RockPaperScissor.Paper]: RockPaperScissorResult.Lose,
+  },
 };
 
 export const getRockPaperScissorScoreRoundOne = (input: string): number => {
-  const rounds = inputToRockPaperScissorRounds(input).map(
-    ([opponentInput, myInput]) => {
-      return [
-        mapOpponentStrategyToRockPaperScissor(opponentInput),
-        mapMyStrategyToRockPaperScissorGuessed(myInput),
-      ];
-    }
-  );
-
-  return rounds.reduce(
-    (acc, [opponentChoice, myChoice]) =>
-      acc + playRockPaperScissorRound(opponentChoice, myChoice) + myChoice,
-    0
-  );
+  return input
+    .split(/\n/)
+    .map((round) => round.split(' '))
+    .map(([opponentInput, myInput]) => [
+      mapInputToRockPaperScissor.get(opponentInput)!,
+      mapInputToRockPaperScissor.get(myInput)!,
+    ])
+    .reduce((acc, [opponentChoice, myChoice]) => {
+      return acc + rockPaperScissorResults[opponentChoice][myChoice] + myChoice;
+    }, 0);
 };
 
 export const getRockPaperScissorScoreRoundTwo = (input: string): number => {
-  const rounds: [RockPaperScissor, RockPaperScissorResult][] =
-    inputToRockPaperScissorRounds(input).map(([opponentInput, myInput]) => {
-      return [
-        mapOpponentStrategyToRockPaperScissor(opponentInput),
-        mapMyStrategyToRockPaperScissorResult(myInput),
-      ];
-    });
+  return input
+    .split(/\n/)
+    .map((round) => round.split(' '))
+    .map<[RockPaperScissor, RockPaperScissorResult]>(
+      ([opponentInput, myInput]) => [
+        mapInputToRockPaperScissor.get(opponentInput)!,
+        mapInputToResult.get(myInput)!,
+      ]
+    )
+    .reduce((acc, [opponentChoice, myChoice]) => {
+      const opponent = rockPaperScissorResults[opponentChoice];
+      const play = Object.keys(opponent)
+        .map((key) => Number(key) as RockPaperScissor)
+        .find((key) => opponent[key] === myChoice)!;
 
-  return rounds.reduce(
-    (acc, [opponentChoice, myChoice]) =>
-      acc +
-      playRockPaperScissorRoundByWinOrLoseStrategy(opponentChoice, myChoice) +
-      myChoice,
-    0
-  );
+      return acc + play + myChoice;
+    }, 0);
 };
