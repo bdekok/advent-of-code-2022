@@ -18,19 +18,21 @@ const partialOverlap = (
 export const getCompleteOverlappingPairs = (input: string): number => {
   return input.split(/\n/).reduce((acc, value) => {
     const [rangeOne, rangeTwo] = value.split(',');
-    if (completeOverlap(splitRangeRow(rangeOne), splitRangeRow(rangeTwo))) {
-      return acc + 1;
-    }
-    return acc;
+    const hasCompleteOverlap = completeOverlap(
+      splitRangeRow(rangeOne),
+      splitRangeRow(rangeTwo)
+    );
+    return hasCompleteOverlap ? acc + 1 : acc;
   }, 0);
 };
 
 export const getPartialOverlappingPairs = (input: string): number => {
   return input.split(/\n/).reduce((acc, value) => {
     const [rangeOne, rangeTwo] = value.split(',');
-    if (partialOverlap(splitRangeRow(rangeOne), splitRangeRow(rangeTwo))) {
-      return acc + 1;
-    }
-    return acc;
+    const hasPartialOverlap = partialOverlap(
+      splitRangeRow(rangeOne),
+      splitRangeRow(rangeTwo)
+    );
+    return hasPartialOverlap ? acc + 1 : acc;
   }, 0);
 };
