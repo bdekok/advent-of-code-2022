@@ -65,6 +65,15 @@ const getDirectorySizes = (fileTree: FileTree): { folderName: string; totalSize:
   });
 };
 
+export const findDirectoryToReleaseSpace = (input: string): number => {
+  const sizes = getDirectorySizes(buildFlattenedFileTree(input));
+  const total = 70000000;
+  const currentlyUsed = sizes.find(({ folderName }) => folderName === "/")!.totalSize;
+  const needed = 30000000 - (total - currentlyUsed);
+
+  return sizes.filter(({ totalSize }) => totalSize > needed).sort((a, b) => a.totalSize - b.totalSize)[0].totalSize;
+};
+
 export const getTotalDirectorySize = (input: string, maxSize = 100000): number => {
   return getDirectorySizes(buildFlattenedFileTree(input))
     .filter(({ totalSize }) => totalSize <= maxSize)

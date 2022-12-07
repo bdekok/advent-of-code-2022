@@ -1,5 +1,5 @@
 import { assertEquals } from '../depts.ts';
-import { getTotalDirectorySize } from './getDirectorySize.ts';
+import { findDirectoryToReleaseSpace, getTotalDirectorySize } from './getDirectorySize.ts';
 
 const testData = `$ cd /
 $ ls
@@ -89,15 +89,8 @@ $ ls
 Deno.test('Exercise one on day 7 gets the size of a directory of max 10000', () => {
   assertEquals(getTotalDirectorySize(testData), 95437);
   assertEquals(getTotalDirectorySize(testDataThreeDeep), 94953 + 584 + 100 + 100); 
-
-
-
 });
 
-Deno.test('Exercise one on day five gets the start of the string', () => {
-  // assertEquals(getDirectorySize(testData), 19);
+Deno.test('Exercise two on day 7 gets the folder to rm -rf', () => {
+  assertEquals(findDirectoryToReleaseSpace(testData), 24933642);
 });
-
-// Deno.test('Exercise one on day five gets crates non reversed', () => {
-//   assertEquals(getFirstOfCratesNonReversed(testData), 'MCD');
-// });
