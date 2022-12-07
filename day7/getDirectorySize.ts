@@ -18,7 +18,6 @@ const buildFlattenedFileTree = (input: string): FileTree => {
 
   for (const line of lines) {
     if (isCd(line)) {
-
       const value = cdValue(line);
       if (value === "/") {
         activeDirectory = "/";
@@ -30,6 +29,9 @@ const buildFlattenedFileTree = (input: string): FileTree => {
       } else {
         activeDirectory += "/" + value;
       }
+      if (!files[activeDirectory]) {
+        files[activeDirectory] = [];
+      }
       continue;
     }
 
@@ -37,7 +39,7 @@ const buildFlattenedFileTree = (input: string): FileTree => {
     if (isLS(line) || fileSize === "dir") {
       continue;
     }
-    if (files[activeDirectory]) {
+    if (files[activeDirectory].length) {
       files[activeDirectory] = [...files[activeDirectory], { fileName, fileSize: Number(fileSize) }];
     } else {
       files[activeDirectory] = [{ fileName, fileSize: Number(fileSize) }];
@@ -49,9 +51,9 @@ const buildFlattenedFileTree = (input: string): FileTree => {
 const getDirectorySizes = (fileTree: FileTree): { folderName: string; totalSize: number }[] => {
   const individualFolderSize = Object.entries(fileTree).map(([folderName, files]) => {
     const folderSize = files.reduce((acc, { fileSize }) => acc + fileSize, 0);
-    return { folderName, folderSize, files };
-  })
-  
+    return { folderName, folderSize };
+  });
+
   return Object.keys(fileTree).map((key) => {
     const nestedFolders = individualFolderSize.filter(({ folderName }) => folderName.startsWith(key));
     const totalSize = nestedFolders.reduce((acc, { folderSize }) => acc + folderSize, 0);
@@ -64,9 +66,7 @@ const getDirectorySizes = (fileTree: FileTree): { folderName: string; totalSize:
 };
 
 export const getTotalDirectorySize = (input: string, maxSize = 100000): number => {
-  const directorySizes = getDirectorySizes(buildFlattenedFileTree(input));
-
-  return directorySizes
+  return getDirectorySizes(buildFlattenedFileTree(input))
     .filter(({ totalSize }) => totalSize <= maxSize)
     .reduce((acc, { totalSize }) => acc + totalSize, 0);
 };
