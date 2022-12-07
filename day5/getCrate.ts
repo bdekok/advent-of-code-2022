@@ -13,7 +13,7 @@ const parsePuzzleData = (input: string): CrateData => {
       row
         .match(/.{1,4}/g)!
         .map((value) =>
-          value.match(/\[(.*?)\]/) ? value.match(/\[(.*?)\]/)![1] : ''
+          value.match(/\[(.*?)\]/g) ? value.match(/\[(.*?)\]/)![1] : ''
         )
     );
   const transposedAndFiltered = data[0].map((_, index) =>
