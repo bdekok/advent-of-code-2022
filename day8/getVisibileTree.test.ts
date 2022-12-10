@@ -12,7 +12,7 @@ Deno.test('Exercise one on day eight gets which trees are visible', () => {
 });
 
 
-Deno.test('Exercise one on day eight gets which trees are visible', () => {
+Deno.test('Exercise two on day eight gets the scenic score', () => {
     assertEquals(getScenicScore(testData), 8);
   });
   

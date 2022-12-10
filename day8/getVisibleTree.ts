@@ -1,12 +1,12 @@
 // deno-lint-ignore-file for-direction
 interface TreeScore {
-    number: number,
-    visible: boolean,
-    why: string;
-    stepsLeft: number,
-    stepsTop: number,
-    stepsRight: number,
-    stepsBottom: number,
+  number: number;
+  visible: boolean;
+  why: string;
+  stepsLeft: number;
+  stepsTop: number;
+  stepsRight: number;
+  stepsBottom: number;
 }
 
 const getTreeScores = (treeMatrix: number[][]): TreeScore[][] => {
@@ -30,22 +30,20 @@ const getTreeScores = (treeMatrix: number[][]): TreeScore[][] => {
       }
       // go left
       for (let index = columnIndex - 1; index >= 0; index--) {
-        const previousColumn = row[index];
         result = { ...result, stepsLeft: result.stepsLeft + 1 };
 
-        if (previousColumn >= current) {
+        if (row[index] >= current) {
           break;
         }
-        if (index === 0 && result.visible === false) {
+        if (index === 0) {
           result = { ...result, visible: true, why: "left" };
         }
       }
       // go right
       for (let index = columnIndex + 1; index <= totalColumnsIndex; index++) {
-        const nextColumn = row[index];
         result = { ...result, stepsRight: result.stepsRight + 1 };
 
-        if (nextColumn >= current) {
+        if (row[index] >= current) {
           break;
         }
         if (index === totalColumnsIndex) {
@@ -54,10 +52,9 @@ const getTreeScores = (treeMatrix: number[][]): TreeScore[][] => {
       }
       // go top
       for (let index = rowIndex - 1; index >= 0; index--) {
-        const topValue = treeMatrix[index][columnIndex];
         result = { ...result, stepsTop: result.stepsTop + 1 };
 
-        if (topValue >= current) {
+        if (treeMatrix[index][columnIndex] >= current) {
           break;
         }
         if (index === 0) {
@@ -66,10 +63,9 @@ const getTreeScores = (treeMatrix: number[][]): TreeScore[][] => {
       }
       // go down
       for (let index = rowIndex + 1; index <= totalRowsIndex; index++) {
-        const bottomValue = treeMatrix[index][columnIndex];
         result = { ...result, stepsBottom: result.stepsBottom + 1 };
 
-        if (bottomValue >= current) {
+        if (treeMatrix[index][columnIndex] >= current) {
           break;
         }
         if (index === totalRowsIndex) {
