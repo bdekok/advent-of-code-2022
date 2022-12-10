@@ -5,11 +5,16 @@ enum Direction {
   Right = "R",
   Down = "D",
   Left = "L",
+  UpRight = "UR",
+  UpLeft = "UL",
+  DownLeft = "DL",
+  DownRight = "DR",
 }
 
 interface Position {
   x: number;
   y: number;
+  hasMoved: boolean;
 }
 
 const move = (position: Position, direction: Direction): Position => {
@@ -22,63 +27,100 @@ const move = (position: Position, direction: Direction): Position => {
       return { ...position, y: position.y + 1 };
     case Direction.Left:
       return { ...position, x: position.x - 1 };
-    
+    case Direction.UpRight:
+      return { ...position, y: position.y - 1, x: position.x + 1 };
+    case Direction.UpLeft:
+      return { ...position, y: position.y - 1, x: position.x - 1 };
+    case Direction.DownLeft:
+      return { ...position, y: position.y + 1, x: position.x - 1 };
+    case Direction.DownRight:
+      return { ...position, y: position.y + 1, x: position.x + 1 };
   }
 };
 
+export const followHead = (head: Position, tail: Position) => {
+  const isOverlapping = head.x - 1 === tail.x && head.y - 1 === tail.y;
+  if (isOverlapping || head.hasMoved == false) {
+    return { ...tail, hasMoved: false };
+  }
+  tail = { ...tail, hasMoved: true };
+
+  const tailMovingUp = head.y === tail.y - 2;
+  const tailMovingDown = head.y === tail.y + 2;
+  const tailMovingRight = head.x === tail.x + 2;
+  const tailMovingLeft = head.x === tail.x - 2;
+  const tailMovingDiagonalRight = head.x >= tail.x + 1;
+  const tailMovingDiagonalUp = head.y <= tail.y - 1;
+  const tailMovingDiagonalLeft = head.x <= tail.x - 1;
+  const tailMovingDiagonalDown = head.y >= tail.y + 1;
+
+  if ((tailMovingDiagonalRight && tailMovingUp) || (tailMovingDiagonalUp && tailMovingRight)) {
+    return move(tail, Direction.UpRight);
+  }
+  if ((tailMovingDiagonalRight && tailMovingDown) || (tailMovingDiagonalDown && tailMovingRight)) {
+    return move(tail, Direction.DownRight);
+  }
+  if ((tailMovingDiagonalUp && tailMovingLeft) || (tailMovingDiagonalLeft && tailMovingUp)) {
+    return move(tail, Direction.UpLeft);
+  }
+  if ((tailMovingDiagonalLeft && tailMovingDown) || (tailMovingDiagonalDown && tailMovingLeft)) {
+    return move(tail, Direction.DownLeft);
+  }
+  if (tailMovingLeft) {
+    return move(tail, Direction.Left);
+  }
+  if (tailMovingRight) {
+    return move(tail, Direction.Right);
+  }
+  if (tailMovingUp) {
+    return move(tail, Direction.Up);
+  }
+  if (tailMovingDown) {
+    return move(tail, Direction.Down);
+  }
+  return { ...tail, hasMoved: false };
+};
+
 export const getVisitedByTail = (input: string): number => {
+  let head: Position = { x: 0, y: 0, hasMoved: true };
+  let tail: Position = { x: 0, y: 0, hasMoved: false };
+  const tailPositions = new Set();
 
-  let head: Position = { x: 0, y: 4 };
-  let tail: Position = { x: 0, y: 4 };
+  for (const line of input.split(/\n/)) {
+    const [direction, stepsString] = line.split(" ") as [Direction, string];
+    const steps = parseInt(stepsString);
+    for (const _ of range(steps)) {
+      head = move(head, direction);
+      tail = followHead(head, tail);
+      tailPositions.add(`${tail.x},${tail.y}`);
+    }
+  }
 
-  const tailPositions = new Set()
+  return tailPositions.size;
+};
+
+export const getVisitedByTailRange = (input: string, tailLength: number): number => {
+  let head: Position = { x: 0, y: 0, hasMoved: true };
+  const tailNumbers: Position[] = range(tailLength).map((_) => ({ x: 0, y: 0, hasMoved: false }));
+  const tailPositions = new Set();
+
   for (const line of input.split(/\n/)) {
     const [direction, stepsString] = line.split(" ") as [Direction, string];
     const steps = parseInt(stepsString);
 
-    console.log('======', direction,steps,  '======')
     for (const _ of range(steps)) {
-      const isOverlapping = head.x === tail.x && head.y === tail.y;
       head = move(head, direction);
-
-      if (isOverlapping) {
-        // console.log({ head, tail, direction, step: _ + 1});
-        console.log(`${tail.x},${tail.y}`)
-
-        tailPositions.add(`${tail.x},${tail.y}`)
-        continue;
+      for (let index = 0; index < tailNumbers.length; index++) {
+        if (index === 0) {
+          tailNumbers[index] = followHead(head, tailNumbers[index]);
+        } else {
+          tailNumbers[index] = followHead(tailNumbers[index - 1], tailNumbers[index]);
+        }
+        if (index === tailLength - 1) {
+          tailPositions.add(`${tailNumbers[index].x},${tailNumbers[index].y}`);
+        }
       }
-
-      const tailMovingUp = head.y - 2 === tail.y 
-      const tailMovingDown = head.y + 2 === tail.y
-      const tailMovingRight = head.x + 2 === tail.x
-      const tailMovingLeft = head.x - 2 === tail.x
-
-      const tailMovingDiagonalRight = head.x - 1 === tail.x && (tailMovingUp || tailMovingDown)
-      const tailMovingDiagonalUp = head.y +1 === tail.y && (tailMovingLeft || tailMovingRight)
-      const tailMovingDiagonalLeft = head.x + 1 === tail.x &&  (tailMovingUp || tailMovingDown)
-      const tailMovingDiagonalDown = head.y -1 === tail.y && (tailMovingLeft || tailMovingRight)
-
-      if(tailMovingDiagonalRight) {
-        tail = move(tail, Direction.Right)
-      }
-      if(tailMovingDiagonalUp) {
-        tail = move(tail, Direction.Up)
-      }
-      if(tailMovingDiagonalLeft) {
-        tail = move(tail, Direction.Left)
-      }
-      if(tailMovingDiagonalDown) {
-        tail = move(tail, Direction.Down)
-      }
-      if (tailMovingLeft || tailMovingRight || tailMovingUp || tailMovingDown) {
-        tail = move(tail, direction);
-      }
-      console.log(`${tail.x},${tail.y}`)
-      tailPositions.add(`${tail.x},${tail.y}`)
     }
   }
-  
-  console.log(tailPositions)
-  return tailPositions.size
+  return tailPositions.size;
 };
