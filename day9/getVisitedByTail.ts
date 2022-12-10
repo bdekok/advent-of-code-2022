@@ -110,7 +110,7 @@ export const getVisitedByTailRange = (input: string, tailLength: number): number
 
     for (const _ of range(steps)) {
       head = move(head, direction);
-      for (let index = 0; index < tailNumbers.length; index++) {
+      for (const index of tailNumbers.keys()) {
         if (index === 0) {
           tailNumbers[index] = followHead(head, tailNumbers[index]);
         } else {
