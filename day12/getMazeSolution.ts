@@ -1,11 +1,3 @@
-const neighbourAccessible = (neighbourValue: string, currentValue: string): boolean => {
-  return currentValue.charCodeAt(0) + 1 >= neighbourValue.charCodeAt(0);
-};
-
-const neighbourAccessibleReverse = (neighbourValue: string, currentValue: string): boolean => {
-  return currentValue.charCodeAt(0) - 1 <= neighbourValue.charCodeAt(0);
-};
-
 interface Coordinate {
   x: number;
   y: number;
@@ -15,7 +7,6 @@ interface MazePosition extends Coordinate {
   value: string;
   isStart: boolean;
   isEnd: boolean;
-  accessibleNeighbours?: MazePosition[];
   traversedPath: Coordinate[];
 }
 
@@ -90,6 +81,14 @@ const getMazeStart = (matrix: MazePosition[][]): MazePosition => {
 
 const getMazeEnd = (matrix: MazePosition[][]): MazePosition => {
   return getMazePosition(matrix, (value: MazePosition) => value.isEnd);
+};
+
+const neighbourAccessible = (neighbourValue: string, currentValue: string): boolean => {
+  return currentValue.charCodeAt(0) + 1 >= neighbourValue.charCodeAt(0);
+};
+
+const neighbourAccessibleReverse = (neighbourValue: string, currentValue: string): boolean => {
+  return currentValue.charCodeAt(0) - 1 <= neighbourValue.charCodeAt(0);
 };
 
 export const getMazeShortest = (input: string): number => {
