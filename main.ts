@@ -2,6 +2,7 @@ import { getDayOneResults } from "./day1/day1.ts";
 import { getDayTenResults } from "./day10/day10.ts";
 import { getDayElevenResults } from "./day11/day11.ts";
 import { getDayTwelveResults } from "./day12/day12.ts";
+import { getDayThirtheenResults } from "./day13/day13.ts";
 import { getDayTwoResults } from "./day2/day2.ts";
 import { getDayThreeResults } from "./day3/day3.ts";
 import { getDayFourResults } from "./day4/day4.ts";
@@ -47,6 +48,8 @@ async function getDayResults() {
       return printResults(await getDayElevenResults());
     case "12":
       return printResults(await getDayTwelveResults());
+    case "13":
+      return printResults(await getDayThirtheenResults());
     default:
       return console.log("We don't know the question, but 42 is the answer");
   }
