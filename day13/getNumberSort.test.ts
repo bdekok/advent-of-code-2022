@@ -1,4 +1,4 @@
-import { checkItem, getSumOfIndexesSortedCorrectly } from "./getNumberSort.ts";
+import { checkItem, getDecoderKey, getSumOfIndexesSortedCorrectly } from "./getNumberSort.ts";
 import { assertEquals } from "../depts.ts";
 
 const testData = `[1,1,3,1,1]
@@ -72,3 +72,8 @@ Deno.test(
     );
   }
 );
+
+
+Deno.test('The decoder key is 140', () => {
+    assertEquals(getDecoderKey(testData), 140)
+})
